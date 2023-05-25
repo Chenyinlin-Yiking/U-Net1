@@ -1,12 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Jinzhong Xu
-# @Contact : jinzhongxu@csu.ac.cn
-# @Time    : 2020/10/29 14:52
-# @File    : augmentation.py
-# @Software: PyCharm
-
-
 import numpy as np
 import os
 import glob
@@ -17,6 +8,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
 class AUGMENTATION:
+    
     """
     数据预处理类，进行数据增强、数据可视化等
     """
@@ -40,14 +32,16 @@ class AUGMENTATION:
 
     @staticmethod
     def adjust(image, mask, flag_multi_class, num_class):
+        
         """
         调整图像数值从 0-255到 0-1之间，并把 mask 图像调整为 0,1 二值图像。
         :param image: 原图像
-        :param mask: groud truth 图像
+        :param mask: groud_truth 图像
         :param flag_multi_class: 标识是否是多类
         :param num_class: 类个数
         :return: 调整后的图像和 mask图像
         """
+        
         if flag_multi_class:
             image = image / 255
             mask = mask[:, :, :, 0] if (len(mask.shape) == 4) else mask[:, :, 0]
@@ -70,6 +64,7 @@ class AUGMENTATION:
                         image_color_mode='grayscale', mask_color_mode='grayscale',
                         image_save_prefix='image', mask_save_prefix='mask', flag_multi_class=False,
                         num_class=2, save_to_dir=None, target_size=(256, 256), seed=1):
+        
         """
         同时生成图像 image和 mask，使用相同的种子保证 image和 mask变换相同。
         如果想查看生成的结果，可设置 save_to_dir
@@ -89,6 +84,7 @@ class AUGMENTATION:
         :param seed: 随机增强的种子，image 和 mask 应保持相同
         :return: 每批增强的图片和相应的 mask, 返回对象是生成器
         """
+        
         image_data_generator = ImageDataGenerator(**aug_dict)
         mask_data_generator = ImageDataGenerator(**aug_dict)
         image_generator = image_data_generator.flow_from_directory(
@@ -119,6 +115,7 @@ class AUGMENTATION:
     @staticmethod
     def test_generator(test_path, num_image=30, target_size=(256, 256), flag_multi_class=False,
                        as_gray=True):
+        
         """
         产生测试数据的生成器
         :param test_path: 测试图片路径
@@ -128,6 +125,7 @@ class AUGMENTATION:
         :param as_gray: 是否以灰度图像作为输入
         :return: 满足格式的测试图片
         """
+        
         for i in range(num_image):
             image = io.imread(os.path.join(test_path, '%d.png' % i), as_gray=as_gray)
             image = image / 255
@@ -138,6 +136,7 @@ class AUGMENTATION:
 
     def generator_train_npy(self, image_path, mask_path, flag_multi_class=False, num_class=2, image_prefix='image',
                             mask_prefix='mask', image_as_gray=True, mask_as_gray=True):
+        
         """
         把图片和 mask 作为 array 对象生成训练数据。当运行内存不足时不建议使用此方法
         :param image_path: 图片路径
@@ -150,6 +149,7 @@ class AUGMENTATION:
         :param mask_as_gray: 是否将 mask 转化为灰度图像
         :return: image and mask 组成的 numpy array 训练数据集
         """
+        
         image_name_arr = glob.glob(os.path.join(image_path, "%s*.png" % image_prefix))
         image_arr = []
         mask_arr = []
@@ -168,6 +168,7 @@ class AUGMENTATION:
 
     @staticmethod
     def label_visualize(num_class, color_dict, image):
+        
         """
         将图片可视化显示，并使用相应的颜色
         :param num_class: 类个数
@@ -175,6 +176,7 @@ class AUGMENTATION:
         :param image: 带显示的图片
         :return: 带显示的彩色图片
         """
+        
         image = image[:, :, 0] if len(image.shape) == 3 else image
         image_out = np.zeros(image.shape + (3,))
         for i in range(num_class):
@@ -182,6 +184,7 @@ class AUGMENTATION:
         return image_out / 255
 
     def save_result(self, save_path, npy_file, flag_multi_class=False, num_class=2):
+        
         """
         把预测的 mask 结果保持起来，一共查看
         :param save_path: 保存目录
@@ -190,6 +193,7 @@ class AUGMENTATION:
         :param num_class: 类别个数
         :return: 0
         """
+        
         for i, item in enumerate(npy_file):
             image = self.label_visualize(num_class, self.color_dict_, item) if flag_multi_class else item[:, :, 0]
             io.imsave(os.path.join(save_path, "%d_predict.png" % i), img_as_ubyte(image))
