@@ -43,10 +43,8 @@ def just_do_it():
     with strategy.scope():
         model = u_net()
     
-    # 保存模型
+    # 显示训练状态 
     model_checkpoint = ModelCheckpoint('u-net.hdf5', monitor='loss', verbose=1, save_best_only=True)
-    
-    # 训练参数
     model.fit(generator, steps_per_epoch=args['steps'], epochs=args['epochs'], callbacks=[model_checkpoint])
 
     # 测试模型
