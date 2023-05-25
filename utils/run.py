@@ -46,7 +46,7 @@ def just_do_it():
     # 保存模型
     model_checkpoint = ModelCheckpoint('u-net.hdf5', monitor='loss', verbose=1, save_best_only=True)
     
-    # 打印参数更新
+    # 训练参数
     model.fit(generator, steps_per_epoch=args['steps'], epochs=args['epochs'], callbacks=[model_checkpoint])
 
     # 测试模型
