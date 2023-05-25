@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Jinzhong Xu
-# @Contact : jinzhongxu@csu.ac.cn
-# @Time    : 2020/10/31 11:02
-# @File    : run.py
-# @Software: PyCharm
-
 from utils.model import *
 from utils.augmentation import AUGMENTATION
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -13,12 +5,13 @@ import os
 import tensorflow as tf
 import argparse
 
-
 def just_do_it():
+    
     """
     模型训练和预测
     :return: 0
     """
+    
     # 构造参数解析
     ap = argparse.ArgumentParser()
     ap.add_argument('-a', '--train', required=False, default='data/membrane/train/', help='path to train data set')
@@ -29,6 +22,7 @@ def just_do_it():
 
     # 多GPU情况下进行分布式训练
     # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2"])
+    
     strategy = tf.distribute.MirroredStrategy()
     data_gen_args = dict(
         rotation_range=0.2,
