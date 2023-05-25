@@ -20,10 +20,11 @@ def just_do_it():
     ap.add_argument('-e', '--epochs', required=False, type=int, default=5, help='epochs for train model')
     args = vars(ap.parse_args())
 
-    # 多GPU情况下进行分布式训练
+    # 使用GPU进行分布式训练
     # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2"])
-    
     strategy = tf.distribute.MirroredStrategy()
+    
+    # 数据增强（旋转，平移，翻转，放大）
     data_gen_args = dict(
         rotation_range=0.2,
         width_shift_range=0.05,
@@ -34,12 +35,21 @@ def just_do_it():
         fill_mode='nearest'
     )
     aug = AUGMENTATION()
+    
+    # 训练模型
     generator = aug.train_generator(2, args['train'], 'images', 'ground_truth', data_gen_args, save_to_dir=None)
+    
+    # GPU加速训练
     with strategy.scope():
         model = u_net()
+    
+    # 保存模型
     model_checkpoint = ModelCheckpoint('u-net.hdf5', monitor='loss', verbose=1, save_best_only=True)
+    
+    # 打印参数更新
     model.fit(generator, steps_per_epoch=args['steps'], epochs=args['epochs'], callbacks=[model_checkpoint])
 
+    # 测试模型
     test_generator_ = aug.test_generator(args['test'])
     results = model.predict(test_generator_, 30, verbose=1)
     aug.save_result(args['test'], results)
